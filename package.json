@@ -1,0 +1,25 @@
+{
+  "name": "terminal-todo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^13.1.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "fast-csv": "^5.0.2",
+    "firebase-admin": "^13.2.0",
+    "inquirer": "^12.5.0",
+    "node-notifier": "^10.0.1",
+    "string-similarity": "^4.0.4",
+    "terminal-kit": "^3.1.2"
+  }
+}
