@@ -1,3 +1,6 @@
+![Node.js](https://img.shields.io/badge/Node.js-CLI-brightgreen?logo=node.js)
+
+
 ### 🪟 Windows Setup (Optional)
 To quickly run your Todo Terminal on Windows:
 
