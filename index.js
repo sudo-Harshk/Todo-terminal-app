@@ -119,8 +119,14 @@ const startStopwatch = require("./commands/startStopwatch");
 program
   .command("stopwatch")
   .description("Start the terminal stopwatch")
-  .action(startStopwatch);
-    
-    
+  .action(startStopwatch);  
+  
+const undoDelete = require("./commands/undoDelete");
+
+program
+  .command("undo")
+  .description("Undo the last deleted task (from trash)")
+  .action(undoDelete);
+  
 
 program.parse(process.argv);

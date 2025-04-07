@@ -18,7 +18,7 @@ const quote = quotes[Math.floor(Math.random() * quotes.length)];
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch"
+  "exit", "help", "stats", "stopwatch",  "undo"
 ];
 
 const rl = readline.createInterface({
@@ -79,6 +79,7 @@ rl.on("line", (line) => {
         ["history", "Show history of completed tasks"],
         ["stats", "Show task statistics"],
         ["stopwatch", "Start a stopwatch timer"],
+        ["undo", "Restore the last deleted task"],
         ["cls / clear", "Clear the terminal screen"],
         ["exit", "Exit todo shell"],
       ];

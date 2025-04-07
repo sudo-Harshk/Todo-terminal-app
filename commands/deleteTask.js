@@ -1,20 +1,24 @@
 const db = require("../firebase/firestore");
 const chalk = require("chalk");
 
-async function deleteTask(id) {
+module.exports = async (id) => {
   try {
-    const doc = await db.collection("tasks").doc(id).get();
+    const taskRef = db.collection("tasks").doc(id);
+    const taskDoc = await taskRef.get();
 
-    if (!doc.exists) {
-      console.log(chalk.red(`❌ No task found with ID: ${id}`));
+    if (!taskDoc.exists) {
+      console.log(chalk.red("❌ Task not found."));
       return;
     }
 
-    await db.collection("tasks").doc(id).delete();
-    console.log(chalk.green(`🗑️  Task with ID ${id} deleted successfully.`));
+    const task = taskDoc.data();
+    task.deletedAt = new Date().toISOString(); // Add deletion timestamp
+
+    await db.collection("trash").doc(id).set(task);     // Move to trash
+    await taskRef.delete();                              // Delete from tasks
+
+    console.log(chalk.yellowBright(`🗑️ Task moved to trash (can undo): "${task.title}"`));
   } catch (err) {
     console.error(chalk.red("❌ Failed to delete task:"), err.message);
   }
-}
-
-module.exports = deleteTask;
+};
