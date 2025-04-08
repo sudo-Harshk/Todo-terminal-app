@@ -127,6 +127,15 @@ program
   .command("undo")
   .description("Undo the last deleted task (from trash)")
   .action(undoDelete);
+
+
+const showStreak = require("./commands/streakTracker");
+
+program
+  .command("streak")
+  .description("Show current task completion streak")
+  .action(showStreak);
+  
   
 
 program.parse(process.argv);

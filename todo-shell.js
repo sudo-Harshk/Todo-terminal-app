@@ -2,7 +2,7 @@
 
 const readline = require("readline");
 const chalk = require("chalk");
-const { exec } = require("child_process");
+const { exec, spawn } = require("child_process");
 const stringSimilarity = require("string-similarity");
 
 const quotes = [
@@ -18,7 +18,7 @@ const quote = quotes[Math.floor(Math.random() * quotes.length)];
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch",  "undo"
+  "exit", "help", "stats", "stopwatch", "undo", "streak"
 ];
 
 const rl = readline.createInterface({
@@ -80,6 +80,7 @@ rl.on("line", (line) => {
         ["stats", "Show task statistics"],
         ["stopwatch", "Start a stopwatch timer"],
         ["undo", "Restore the last deleted task"],
+        ["streak", "View your task completion streak"],
         ["cls / clear", "Clear the terminal screen"],
         ["exit", "Exit todo shell"],
       ];
@@ -138,20 +139,15 @@ rl.on("line", (line) => {
         return;
       }
 
-      const { spawn } = require("child_process");
-
       if (command === "stopwatch") {
         rl.pause();
-
         const stopwatch = spawn("node", ["index.js", "stopwatch"], {
           stdio: "inherit",
         });
-
         stopwatch.on("exit", () => {
           rl.resume();
           rl.prompt();
         });
-
         return;
       }
 
@@ -162,7 +158,6 @@ rl.on("line", (line) => {
       child.on("exit", () => {
         rl.prompt();
       });
-
       return;
   }
 
