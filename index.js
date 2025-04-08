@@ -136,6 +136,12 @@ program
   .description("Show current task completion streak")
   .action(showStreak);
   
-  
+const deleteAll = require("./commands/deleteAll");
+
+program
+  .command("delete-all")
+  .description("Delete all tasks permanently")
+  .action(deleteAll);
+   
 
 program.parse(process.argv);

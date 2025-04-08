@@ -2,7 +2,7 @@
 
 const readline = require("readline");
 const chalk = require("chalk");
-const { exec, spawn } = require("child_process");
+const { spawn } = require("child_process");
 const stringSimilarity = require("string-similarity");
 
 const quotes = [
@@ -18,7 +18,7 @@ const quote = quotes[Math.floor(Math.random() * quotes.length)];
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch", "undo", "streak"
+  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all"
 ];
 
 const rl = readline.createInterface({
@@ -81,6 +81,7 @@ rl.on("line", (line) => {
         ["stopwatch", "Start a stopwatch timer"],
         ["undo", "Restore the last deleted task"],
         ["streak", "View your task completion streak"],
+        ["delete-all", "⚠️ Delete all tasks (with confirmation)"],
         ["cls / clear", "Clear the terminal screen"],
         ["exit", "Exit todo shell"],
       ];
