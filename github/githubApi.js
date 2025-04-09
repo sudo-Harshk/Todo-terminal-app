@@ -1,4 +1,3 @@
-// github/githubApi.js
 const axios = require("axios");
 const chalk = require("chalk");
 const { prompt } = require("enquirer");

@@ -1,4 +1,3 @@
-// github/openBrowser.js
 const { spawn } = require("child_process");
 const chalk = require("chalk");
 const os = require("os");
