@@ -143,5 +143,21 @@ program
   .description("Delete all tasks permanently")
   .action(deleteAll);
    
+const githubExplorer = require("./github/githubExplorer");
 
+program
+  .command("github")
+  .description("Explore your GitHub repos and files")
+  .action(() => {
+    (async () => {
+      try {
+        await githubExplorer();
+      } catch (err) {
+        console.error("❌ GitHub Explorer failed:", err.message);
+      } finally {
+        process.exit(0);
+      }
+    })();
+  });
+  
 program.parse(process.argv);

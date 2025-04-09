@@ -6,19 +6,15 @@ const { spawn } = require("child_process");
 const stringSimilarity = require("string-similarity");
 
 const quotes = [
-  "Stay focused.",
-  "Make today count.",
-  "Clarity through action.",
-  "Todo. Done. Repeat.",
-  "Discipline is freedom.",
-  "Organize the chaos 🧠",
+  "Stay focused.", "Make today count.", "Clarity through action.",
+  "Todo. Done. Repeat.", "Discipline is freedom.", "Organize the chaos 🧠"
 ];
 const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all"
+  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github"
 ];
 
 const rl = readline.createInterface({
@@ -29,13 +25,9 @@ const rl = readline.createInterface({
 
 function showAnimatedIntro(callback) {
   console.clear();
-  const lines = [
-    chalk.cyan("🌀 Starting..."),
-    chalk.gray("🎯 Preparing your space..."),
-  ];
+  const lines = [chalk.cyan("🌀 Starting..."), chalk.gray("🎯 Preparing your space...")];
   let i = 0;
   const delay = 700;
-
   const interval = setInterval(() => {
     if (i >= lines.length) {
       clearInterval(interval);
@@ -50,39 +42,37 @@ function showAnimatedIntro(callback) {
   }, delay);
 }
 
-showAnimatedIntro(() => {
-  rl.prompt();
-});
+showAnimatedIntro(() => rl.prompt());
 
 rl.on("line", (line) => {
   const input = line.trim();
   if (!input) return rl.prompt();
 
   const [command, ...args] = input.split(" ");
-  const argString = args.join(" ");
 
   switch (command) {
     case "help":
       console.log(chalk.cyanBright.bold("\n📘 Available Commands:\n"));
       const helpCommands = [
-        ["list", "List all tasks or filter by --date"],
-        ["dashboard", "Show overall task summary dashboard"],
-        ["week", "Weekly agenda (use --offset to navigate)"],
-        ["day --date DD-MM-YYYY", "View tasks for a specific day"],
-        ['add "<title>" --date YYYY-MM-DD --time HH:mm', "Add a new task"],
-        ['edit <id> --title --date --time', "Edit task fields"],
-        ["delete <id>", "Delete a task by ID"],
-        ["done <id>", "Mark task as done"],
-        ["undone <id>", "Mark task as pending"],
-        ["search <keyword>", "Search tasks by title keyword"],
-        ["export", "Export tasks to tasks.csv"],
-        ["history", "Show history of completed tasks"],
+        ["list", "List tasks or filter by date"],
+        ["dashboard", "Overall summary"],
+        ["week", "Weekly agenda"],
+        ["day --date", "Day view"],
+        ["add \"<title>\" --date --time", "Add new task"],
+        ["edit <id> --title --date --time", "Edit a task"],
+        ["delete <id>", "Delete a task"],
+        ["done <id>", "Mark as done"],
+        ["undone <id>", "Mark as pending"],
+        ["search <keyword>", "Search by title"],
+        ["export", "Export to tasks.csv"],
+        ["history", "Completed task history"],
         ["stats", "Show task statistics"],
-        ["stopwatch", "Start a stopwatch timer"],
-        ["undo", "Restore the last deleted task"],
-        ["streak", "View your task completion streak"],
-        ["delete-all", "⚠️ Delete all tasks (with confirmation)"],
-        ["cls / clear", "Clear the terminal screen"],
+        ["stopwatch", "Start stopwatch timer"],
+        ["undo", "Undo last deleted task"],
+        ["streak", "Your completion streak"],
+        ["delete-all", "⚠️ Delete all tasks"],
+        ["github", "Explore your GitHub repos"],
+        ["cls / clear", "Clear terminal"],
         ["exit", "Exit todo shell"],
       ];
       const width = 48;
@@ -105,31 +95,7 @@ rl.on("line", (line) => {
       return;
 
     default:
-      if (["add", "done", "undone", "delete", "edit"].includes(command) && args.length === 0) {
-        console.log(chalk.red(`❌ Missing arguments for '${command}'.`));
-        const usageMap = {
-          add: `add "<title>" --date YYYY-MM-DD --time HH:mm`,
-          done: `done <id>`,
-          undone: `undone <id>`,
-          delete: `delete <id>`,
-          edit: `edit <id> --title --date --time`,
-        };
-        if (usageMap[command]) {
-          console.log(chalk.gray(`Usage: ${usageMap[command]}`));
-        }
-        rl.prompt();
-        return;
-      }
-
-      if (command.startsWith("--")) {
-        console.log(chalk.red(`❌ '${command}' is an option, not a command.`));
-        console.log(chalk.yellow(`💡 Use it with a command like 'add' or 'day'\n`));
-        rl.prompt();
-        return;
-      }
-
       const match = stringSimilarity.findBestMatch(command, knownCommands).bestMatch;
-
       if (!knownCommands.includes(command)) {
         console.log(chalk.red(`❌ Unknown command: '${command}'`));
         if (match.rating > 0.4 && match.target !== command) {
@@ -140,12 +106,10 @@ rl.on("line", (line) => {
         return;
       }
 
-      if (command === "stopwatch") {
+      if (command === "stopwatch" || command === "github") {
         rl.pause();
-        const stopwatch = spawn("node", ["index.js", "stopwatch"], {
-          stdio: "inherit",
-        });
-        stopwatch.on("exit", () => {
+        const child = spawn("node", ["index.js", command], { stdio: "inherit" });
+        child.on("exit", () => {
           rl.resume();
           rl.prompt();
         });
@@ -155,7 +119,6 @@ rl.on("line", (line) => {
       const child = spawn("node", ["index.js", ...input.split(" ")], {
         stdio: "inherit",
       });
-
       child.on("exit", () => {
         rl.prompt();
       });
