@@ -14,7 +14,7 @@ const quote = quotes[Math.floor(Math.random() * quotes.length)];
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github"
+  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github",
 ];
 
 const rl = readline.createInterface({
