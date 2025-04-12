@@ -5,12 +5,6 @@ const chalk = require("chalk");
 const { spawn } = require("child_process");
 const stringSimilarity = require("string-similarity");
 
-const quotes = [
-  "Stay focused.", "Make today count.", "Clarity through action.",
-  "Todo. Done. Repeat.", "Discipline is freedom.", "Organize the chaos 🧠"
-];
-const quote = quotes[Math.floor(Math.random() * quotes.length)];
-
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
@@ -73,7 +67,6 @@ rl.on("line", (line) => {
         ["delete-all", "⚠️ Delete all tasks"],
         ["github", "Explore your GitHub repos"],
         ["cls / clear", "Clear terminal"],
-        ["youtube", "For youtube Search"],
         ["exit", "Exit todo shell"],
       ];
       const width = 48;
@@ -107,22 +100,22 @@ rl.on("line", (line) => {
         return;
       }
 
-      if (command === "stopwatch" || command === "github") {
-        rl.pause();
-        const child = spawn("node", ["index.js", command], { stdio: "inherit" });
-        child.on("exit", () => {
-          rl.resume();
-          rl.prompt();
-        });
-        return;
-      }
+      rl.pause();
 
       const child = spawn("node", ["index.js", ...input.split(" ")], {
         stdio: "inherit",
       });
+
+      // Only show the enquirer message for GitHub
+      if (command === "github") {
+        console.log(chalk.gray("Starting GitHub Explorer with enquirer"));
+      }
+
       child.on("exit", () => {
+        rl.resume();
         rl.prompt();
       });
+
       return;
   }
 
