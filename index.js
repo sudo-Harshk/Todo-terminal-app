@@ -137,11 +137,12 @@ program
 
 const youtubeCommand = require("./commands/youtubeCommand");
 program
-  .command("youtube <query...>")
-  .description("Search and watch YouTube videos")
-  .action((query) => {
-    youtubeCommand(query.join(" "));
-  }); 
+  .command("youtube [query...]")
+  .description("Search YouTube or by channel")
+  .option("--channel <channelId>", "Fetch videos from a YouTube channel")
+  .action((queryArgs, options) => {
+    require("./commands/youtubeCommand")(queryArgs || [], options);
+  });
 
 
 program.parse(process.argv);

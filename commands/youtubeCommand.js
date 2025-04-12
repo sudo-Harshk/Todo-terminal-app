@@ -1,34 +1,37 @@
-const searchYouTube = require('../youtube/searchYouTube');
-const { Select } = require('enquirer');
-const open = require('open');
+const inquirer = require("inquirer");
+const open = require("open");
+const searchYouTube = require("../youtube/searchYouTube");
+const getChannelId = require("../youtube/channelSearch");
 
-module.exports = async function youtubeCommand(query) {
-  console.log(`YouTube search: ${query}`);
+module.exports = async function youtubeCommand(queryArgs, options) {
+  const isChannel = options.channel !== undefined;
+  let query = isChannel ? options.channel : queryArgs.join(" ");
 
   try {
-    const results = await searchYouTube(query);
-    if (results.length === 0) {
-      console.log('❌ No results found.');
-      return;
+    if (isChannel) {
+      const channelId = await getChannelId(query);
+      query = channelId;
     }
 
-    console.log('Search Results:');
-    console.table(results);
+    const results = await searchYouTube({ query, isChannel });
 
-    const prompt = new Select({
-      name: 'video',
-      message: 'Select a video to watch:',
-      choices: results.map((result, index) => ({
-        name: `${index + 1}. ${result.title} (${result.channel})`,
-        value: result.url,
-      })),
-    });
+    console.log("\n📺 Search Results:");
+    const choices = results.map((r, i) => ({
+      name: `${i + 1}. ${r.title} (${r.channel})`,
+      value: r.url
+    }));
 
-    const selectedUrl = await prompt.run();
-    console.log(`Opening: ${selectedUrl}`);
+    const { selectedUrl } = await inquirer.prompt([
+      {
+        name: "selectedUrl",
+        type: "list",
+        message: "🎬 Select a video to open in browser:",
+        choices
+      }
+    ]);
+
     await open(selectedUrl);
   } catch (err) {
-    console.error('❌ Error during YouTube search:', err.message);
-    if (err.stack) console.error('Stack trace:', err.stack); // Log full stack for debugging
+    console.error("❌", err.message || err);
   }
 };

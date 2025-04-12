@@ -14,7 +14,7 @@ const quote = quotes[Math.floor(Math.random() * quotes.length)];
 const knownCommands = [
   "list", "dashboard", "week", "day", "add", "edit", "delete",
   "done", "undone", "search", "export", "history", "cls", "clear",
-  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github",
+  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github", "youtube"
 ];
 
 const rl = readline.createInterface({
@@ -73,6 +73,7 @@ rl.on("line", (line) => {
         ["delete-all", "⚠️ Delete all tasks"],
         ["github", "Explore your GitHub repos"],
         ["cls / clear", "Clear terminal"],
+        ["youtube", "For youtube Search"],
         ["exit", "Exit todo shell"],
       ];
       const width = 48;

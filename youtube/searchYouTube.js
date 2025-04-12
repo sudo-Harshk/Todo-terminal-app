@@ -1,119 +1,54 @@
 const { spawn } = require("child_process");
 
-module.exports = async function searchYouTube(query) {
+module.exports = function searchYouTube({ query, isChannel = false }) {
   return new Promise((resolve, reject) => {
     const results = [];
-    let errorOutput = "";
-    const maxResults = 10; // ytsearch10 returns up to 10 results
-    const barLength = 20; // Length of the progress bar in characters
+    const barLength = 20;
 
-    // Function to draw progress bar
     const drawProgressBar = (current, total) => {
-      const percentage = Math.min(Math.round((current / total) * 100), 100);
-      const filled = Math.round((percentage / 100) * barLength);
-      const empty = barLength - filled;
-      const bar = `[${"=".repeat(filled)}${"-".repeat(empty)}] ${percentage}%`;
-      process.stdout.write(`\r🔍 Searching YouTube: ${bar}`);
+      const percent = Math.min(Math.round((current / total) * 100), 100);
+      const filled = Math.round((percent / 100) * barLength);
+      const bar = `[${"=".repeat(filled)}${"-".repeat(barLength - filled)}] ${percent}%`;
+      process.stdout.write(`\r🔍 Fetching videos: ${bar}`);
     };
 
-    // Stop progress bar and clear line
-    const stopProgressBar = (message) => {
-      process.stdout.write("\r\x1b[K"); // Clear the line
-      console.log(message);
+    const stopBar = (msg) => {
+      process.stdout.write("\r\x1b[K");
+      console.log(msg);
     };
 
-    // Function to truncate string with ellipsis
-    const truncate = (str, maxLength) => {
-      return str.length > maxLength ? str.slice(0, maxLength - 3) + "..." : str;
-    };
+    const args = isChannel
+      ? [`https://www.youtube.com/channel/${query}`, "--flat-playlist", "--print", "%(title)s||%(webpage_url)s||%(duration_string)s"]
+      : [`ytsearch10:${query}`, "--print", "%(title)s||%(webpage_url)s||%(duration_string)s||%(view_count)s||%(channel)s"];
 
-    // Function to print aligned table
-    const printResults = (results) => {
-      // Define maximum allowed lengths with caps
-      const maxAllowedLengths = {
-        title: 50,    // Cap title at 50 characters
-        url: 60,      // Cap URL at 60 characters
-        duration: 8,  // Fixed width for duration
-        views: 10,    // Cap views at 10 characters
-        channel: 30   // Cap channel at 30 characters
-      };
-
-      // Calculate actual max lengths, capped by allowed limits
-      const maxLengths = {
-        title: Math.min(Math.max(...results.map(r => r.title.length), 10), maxAllowedLengths.title),
-        url: Math.min(Math.max(...results.map(r => r.url.length), 20), maxAllowedLengths.url),
-        duration: Math.min(Math.max(...results.map(r => r.duration.length), 8), maxAllowedLengths.duration),
-        views: Math.min(Math.max(...results.map(r => String(r.views).length), 5), maxAllowedLengths.views),
-        channel: Math.min(Math.max(...results.map(r => r.channel.length), 10), maxAllowedLengths.channel)
-      };
-
-      console.log("\nSearch Results:");
-      console.log(`title${"".padEnd(maxLengths.title - 5)} url${"".padEnd(maxLengths.url - 3)} duration${"".padEnd(maxLengths.duration - 8)} views${"".padEnd(maxLengths.views - 5)} channel${"".padEnd(maxLengths.channel - 7)}`);
-      results.forEach((result) => {
-        console.log(`${truncate(result.title, maxLengths.title).padEnd(maxLengths.title)} ${truncate(result.url, maxLengths.url).padEnd(maxLengths.url)} ${truncate(result.duration, maxLengths.duration).padEnd(maxLengths.duration)} ${String(truncate(String(result.views), maxLengths.views)).padEnd(maxLengths.views)} ${truncate(result.channel, maxLengths.channel).padEnd(maxLengths.channel)}`);
-      });
-    };
-
-    // Validate yt-dlp installation
-    try {
-      require("child_process").execSync("yt-dlp --version", { stdio: "ignore" });
-    } catch {
-      stopProgressBar("❌ yt-dlp is not installed or not found in PATH.");
-      return reject(new Error("❌ yt-dlp is not installed or not found in PATH."));
-    }
-
-    const yt = spawn("yt-dlp", [
-      `ytsearch10:${query}`,
-      "--print",
-      "%(title)s||%(webpage_url)s||%(duration_string)s||%(view_count)s||%(channel)s"
-    ]);
-
-    // Initialize progress bar
-    drawProgressBar(0, maxResults);
+    console.log(`YouTube search: ${isChannel ? "channel: " + query : query}`);
+    const yt = spawn("yt-dlp", args);
 
     yt.stdout.on("data", (data) => {
-      const lines = data.toString().split("\n").filter(line => line.trim() && line.includes("||"));
-      for (const line of lines) {
+      const lines = data.toString().split("\n").filter(line => line.includes("||"));
+      lines.forEach(line => {
         const parts = line.trim().split("||");
-        // Ensure exactly 5 fields
-        if (parts.length === 5) {
-          const [title, url, duration, views, channel] = parts.map(part => part.trim());
-          // Strict check for non-empty fields after trimming
-          if (title && url && duration && views && channel && 
-              title.trim() !== "" && url.trim() !== "" && duration.trim() !== "" && 
-              views.trim() !== "" && channel.trim() !== "") {
-            results.push({ 
-              title, 
-              url, 
-              duration, 
-              views: parseInt(views) || 0, 
-              channel 
-            });
-            drawProgressBar(results.length, maxResults); // Update bar per result
-          }
+        if (isChannel && parts.length === 3) {
+          const [title, url, duration] = parts;
+          results.push({ title, url, duration, channel: "📺 Channel" });
+        } else if (!isChannel && parts.length === 5) {
+          const [title, url, duration, views, channel] = parts;
+          results.push({ title, url, duration, views, channel });
         }
-      }
+        drawProgressBar(results.length, 10);
+      });
     });
 
-    yt.stderr.on("data", (err) => {
-      errorOutput += err.toString();
-      console.error("❌ yt-dlp stderr:", err.toString());
-    });
+    yt.stderr.on("data", err => console.error("yt-dlp error:", err.toString()));
 
     yt.on("close", (code) => {
-      if (results.length) {
-        stopProgressBar(`✅ yt-dlp exited with code ${code}`);
-        printResults(results); // Print aligned results
-        resolve(results);
-      } else {
-        stopProgressBar("❌ No results found.");
-        reject(new Error(errorOutput || "❌ No results found."));
-      }
+      stopBar(`✅ yt-dlp exited with code ${code}`);
+      resolve(results);
     });
 
-    yt.on("error", (err) => {
-      stopProgressBar("❌ Failed to launch yt-dlp.");
-      reject(new Error("❌ Failed to launch yt-dlp: " + err.message));
+    yt.on("error", err => {
+      stopBar("❌ Failed to launch yt-dlp.");
+      reject(new Error("❌ yt-dlp error: " + err.message));
     });
   });
 };

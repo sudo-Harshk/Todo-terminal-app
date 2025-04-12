@@ -20,7 +20,7 @@
     "enquirer": "^2.4.1",
     "fast-csv": "^5.0.2",
     "firebase-admin": "^13.2.0",
-    "inquirer": "^12.5.2",
+    "inquirer": "^8.2.6",
     "node-notifier": "^10.0.1",
     "open": "^8.4.2",
     "string-similarity": "^4.0.4",
