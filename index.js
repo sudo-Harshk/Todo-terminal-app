@@ -1,148 +1,132 @@
-const { program } = require("commander");
-const dotenv = require("dotenv");
-dotenv.config();
+#!/usr/bin/env node
 
-const addTask = require("./commands/addTask");
-program
-  .command("add <title>")
-  .description("Add a new task")
-  .option("--date <date>", "Date in YYYY-MM-DD format")
-  .option("--time <time>", "Time in HH:mm format")
-  .option("--priority <level>", "Priority (low, medium, high)")
-  .action(addTask);
+const readline = require("readline");
+const chalk = require("chalk");
+const { spawn } = require("child_process");
+const stringSimilarity = require("string-similarity");
 
-const listTasks = require("./commands/listTasks");
-program
-  .command("list")
-  .description("List all tasks or filter by date/status/priority")
-  .option("--date <date>", "Filter by date (YYYY-MM-DD)")
-  .option("--status <status>", "Filter by status (pending, done)")
-  .option("--priority <priority>", "Filter by priority (low, medium, high)")
-  .option("--sort <field>", "Sort by field: date, time, title, status, priority")
-  .option("--reverse", "Reverse the sort order")
-  .action(listTasks);
+const knownCommands = [
+  "list", "dashboard", "week", "day", "add", "edit", "delete",
+  "done", "undone", "search", "export", "history", "cls", "clear",
+  "exit", "help", "stats", "stopwatch", "undo", "streak", "delete-all", "github", "youtube"
+];
 
-const deleteTask = require("./commands/deleteTask");
-program
-  .command("delete <id>")
-  .description("Delete a task by ID")
-  .action(deleteTask);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: "todo> ",
+});
 
-const markDone = require("./commands/markDone");
-program
-  .command("done <id>")
-  .description("Mark a task as done")
-  .action(markDone);
+function showAnimatedIntro(callback) {
+  console.clear();
+  const lines = [chalk.cyan("🌀 Starting..."), chalk.gray("🎯 Preparing your space...")];
+  let i = 0;
+  const delay = 700;
+  const interval = setInterval(() => {
+    if (i >= lines.length) {
+      clearInterval(interval);
+      console.log();
+      console.log(chalk.greenBright("📦 Welcome to Your Todo Terminal"));
+      console.log(chalk.gray("Type 'help' to see available commands.\n"));
+      callback();
+    } else {
+      console.log(lines[i]);
+      i++;
+    }
+  }, delay);
+}
 
-const showWeekView = require("./commands/weekView");
-program
-  .command("week")
-  .description("Show weekly agenda with optional navigation")
-  .option("--offset <weeks>", "Number of weeks from now (e.g., -1, 0, 1, 2)")
-  .action(showWeekView);
+showAnimatedIntro(() => rl.prompt());
 
-const markUndone = require("./commands/markUndone");
-program
-  .command("undone <id>")
-  .description("Mark a task as pending (undo done)")
-  .action(markUndone);
+rl.on("line", (line) => {
+  const input = line.trim();
+  if (!input) return rl.prompt();
 
-const editTask = require("./commands/editTask");
-program
-  .command("edit <id>")
-  .description("Edit a task's title, date, or time")
-  .option("--title <title>", "New title for the task")
-  .option("--date <date>", "New date (YYYY-MM-DD)")
-  .option("--time <time>", "New time (HH:mm)")
-  .action(editTask);
+  const [command, ...args] = input.split(" ");
 
-const searchTasks = require("./commands/searchTasks");
-program
-  .command("search <keyword>")
-  .description("Search tasks by keyword in title")
-  .action(searchTasks);
+  switch (command) {
+    case "help":
+      console.log(chalk.cyanBright.bold("\n📘 Available Commands:\n"));
+      const helpCommands = [
+        ["list", "List tasks or filter by date"],
+        ["dashboard", "Overall summary"],
+        ["week", "Weekly agenda"],
+        ["day --date", "Day view"],
+        ["add \"<title>\" --date --time", "Add new task"],
+        ["edit <id> --title --date --time", "Edit a task"],
+        ["delete <id>", "Delete a task"],
+        ["done <id>", "Mark as done"],
+        ["undone <id>", "Mark as pending"],
+        ["search <keyword>", "Search by title"],
+        ["export", "Export to tasks.csv"],
+        ["history", "Completed task history"],
+        ["stats", "Show task statistics"],
+        ["stopwatch", "Start stopwatch timer"],
+        ["undo", "Undo last deleted task"],
+        ["streak", "Your completion streak"],
+        ["delete-all", "⚠️ Delete all tasks"],
+        ["github", "Explore your GitHub repos"],
+        ["cls / clear", "Clear terminal"],
+        ["exit", "Exit todo shell"],
+      ];
+      const width = 48;
+      helpCommands.forEach(([cmd, desc]) => {
+        const padded = cmd.padEnd(width, " ");
+        console.log(`  ${chalk.green(padded)}→  ${desc}`);
+      });
+      console.log();
+      break;
 
-const showDayView = require("./commands/dayView");
-program
-  .command("day")
-  .description("View tasks for a specific day (DD-MM-YYYY)")
-  .option("--date <date>", "Date in DD-MM-YYYY format")
-  .action(showDayView);
+    case "cls":
+    case "clear":
+      console.clear();
+      rl.prompt();
+      return;
 
-const showDashboard = require("./commands/dashboard");
-program
-  .command("dashboard")
-  .description("Show overall task summary dashboard")
-  .action(showDashboard);
+    case "exit":
+      console.log(chalk.blue("👋 Exiting todo terminal..."));
+      rl.close();
+      return;
 
-const exportTasks = require("./commands/exportTasks");
-program
-  .command("export")
-  .description("Export all tasks to tasks.csv")
-  .action(exportTasks);
+    default:
+      const match = stringSimilarity.findBestMatch(command, knownCommands).bestMatch;
 
-const showHistory = require("./commands/history");
-program
-  .command("history")
-  .description("Show history of completed tasks")
-  .action(showHistory);
-
-const showStats = require("./commands/stats");
-program
-  .command("stats")
-  .description("Show task statistics")
-  .action(showStats);
-
-const startStopwatch = require("./commands/startStopwatch");
-program
-  .command("stopwatch")
-  .description("Start the terminal stopwatch")
-  .action(startStopwatch);
-
-const undoDelete = require("./commands/undoDelete");
-program
-  .command("undo")
-  .description("Undo the last deleted task (from trash)")
-  .action(undoDelete);
-
-const showStreak = require("./commands/streakTracker");
-program
-  .command("streak")
-  .description("Show current task completion streak")
-  .action(showStreak);
-
-const deleteAll = require("./commands/deleteAll");
-program
-  .command("delete-all")
-  .description("Delete all tasks permanently")
-  .action(deleteAll);
-
-const githubExplorer = require("./github/githubExplorer");
-program
-  .command("github")
-  .description("Explore your GitHub repos and files")
-  .action(() => {
-    (async () => {
-      try {
-        await githubExplorer();
-      } catch (err) {
-        console.error("❌ GitHub Explorer failed:", err.message);
-      } finally {
-        process.exit(0);
+      if (!knownCommands.includes(command)) {
+        console.log(chalk.red(`❌ Unknown command: '${command}'`));
+        if (match.rating > 0.4 && match.target !== command) {
+          console.log(chalk.yellow(`💡 Did you mean '${match.target}'?`));
+        }
+        console.log(chalk.gray("Type 'help' to see available commands.\n"));
+        rl.prompt();
+        return;
       }
-    })();
-  });
 
+      if (command === "stopwatch" || command === "github") {
+        if (command === "github") {
+          console.log(chalk.gray("Starting GitHub Explorer with enquirer"));
+        }
+        rl.pause();
+        const child = spawn("node", ["index.js", command], { stdio: "inherit" });
+        child.on("exit", () => {
+          rl.resume();
+          rl.prompt();
+        });
+        return;
+      }
 
+      const child = spawn("node", ["index.js", ...input.split(" ")], {
+        stdio: "inherit",
+      });
+      child.on("exit", () => {
+        rl.prompt();
+      });
+      return;
+  }
 
-const youtubeCommand = require("./commands/youtubeCommand");
-program
-  .command("youtube [query...]")
-  .description("Search YouTube or by channel")
-  .option("--channel <channelId>", "Fetch videos from a YouTube channel")
-  .action((queryArgs, options) => {
-    require("./commands/youtubeCommand")(queryArgs || [], options);
-  });
+  rl.prompt();
+});
 
-
-program.parse(process.argv);
+rl.on("close", () => {
+  console.log(chalk.gray("🛑 Terminal session closed.\n"));
+  process.exit(0);
+});
