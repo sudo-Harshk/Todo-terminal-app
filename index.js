@@ -54,6 +54,7 @@ program
   .option("--title <title>", "New title for the task")
   .option("--date <date>", "New date (YYYY-MM-DD)")
   .option("--time <time>", "New time (HH:mm)")
+  .option("--priority <level>", "New priority (low, medium, high)")
   .action(editTask);
 
 const searchTasks = require("./commands/searchTasks");
@@ -96,7 +97,7 @@ program
 const startStopwatch = require("./commands/startStopwatch");
 program
   .command("stopwatch")
-  .description("Start the terminal stopwatch")
+  .description("Starts an interactive stopwatch timer with controls (s: start, p: pause, r: reset, q: quit)")
   .action(startStopwatch);
 
 const undoDelete = require("./commands/undoDelete");
@@ -128,7 +129,7 @@ program
       } catch (err) {
         console.error("❌ GitHub Explorer failed:", err.message);
       } finally {
-        process.exit(0);
+        // process.exit(0); // Removed to prevent exiting the main app
       }
     })();
   });
@@ -138,11 +139,13 @@ program
 const youtubeCommand = require("./commands/youtubeCommand");
 program
   .command("youtube [query...]")
-  .description("Search YouTube or by channel")
-  .option("--channel <channelId>", "Fetch videos from a YouTube channel")
+  .description("Search videos (e.g., 'funny cats') or use --channel <ID_or_Name> for specific channel videos.")
+  .option("--channel <channelId>", "Fetch videos from a specific YouTube channel (use quotes for names with spaces)")
   .action((queryArgs, options) => {
     require("./commands/youtubeCommand")(queryArgs || [], options);
   });
 
 
+// Enable the default help command
+program.addHelpCommand(true);
 program.parse(process.argv);

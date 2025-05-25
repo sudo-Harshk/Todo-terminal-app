@@ -67,10 +67,10 @@ module.exports = async (id, options) => {
     await db.collection("tasks").doc(id).update(updates);
 
     console.log(chalk.greenBright(`✅ Task ${id} updated successfully:`));
-    if (title) console.log(`📝 Title    → ${title}`);
-    if (date) console.log(`📅 Date     → ${date}`);
-    if (time) console.log(`⏰ Time     → ${time}`);
-    if (priority) console.log(`🔖 Priority → ${priority.toLowerCase()}`);
+    if (updates.title) console.log(`📝 Title    → ${updates.title}`);
+    if (updates.date) console.log(`📅 Date     → ${updates.date}`);
+    if (updates.time) console.log(`⏰ Time     → ${updates.time}`);
+    if (updates.priority) console.log(`🔖 Priority → ${updates.priority}`);
 
   } catch (err) {
     console.error(chalk.red("❌ Failed to update task:"), err.message);

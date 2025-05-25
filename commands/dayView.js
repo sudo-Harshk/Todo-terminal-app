@@ -11,13 +11,13 @@ async function showDayView(options) {
   const { date } = options;
 
   if (!date) {
-    console.log(chalk.red("❌ Please provide a date using --date DD-MM-YYYY"));
+    console.log(chalk.red("❌ Please provide a date using --date YYYY-MM-DD"));
     return;
   }
 
-  const parsed = dayjs(date, "DD-MM-YYYY");
+  const parsed = dayjs(date, "YYYY-MM-DD");
   if (!parsed.isValid()) {
-    console.log(chalk.red("❌ Invalid date format. Use --date DD-MM-YYYY"));
+    console.log(chalk.red("❌ Invalid date format. Use --date YYYY-MM-DD"));
     return;
   }
 
