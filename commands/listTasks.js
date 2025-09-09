@@ -1,5 +1,4 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 
 async function listTasks(options) {
   const { date, sort, status, reverse, priority } = options;
@@ -22,7 +21,7 @@ async function listTasks(options) {
     const snapshot = await query.get();
 
     if (snapshot.empty) {
-      console.log(chalk.yellow("⚠️ No tasks found."));
+      console.log("⚠️ No tasks found.");
       return;
     }
 
@@ -36,9 +35,9 @@ async function listTasks(options) {
     // Handle invalid sort field with suggestion
     const validSorts = ["date", "time", "title", "status", "priority"];
     if (sort && !validSorts.includes(sort)) {
-      console.log(chalk.red(`❌ Invalid sort field: '${sort}'`));
-      console.log(chalk.yellow(`💡 Use --sort with one of: ${validSorts.join(", ")}`));
-      console.log(chalk.gray(`\nExample: list --sort priority --reverse\n`));
+      console.log(`❌ Invalid sort field: '${sort}'`);
+      console.log(`💡 Use --sort with one of: ${validSorts.join(", ")}`);
+      console.log(`\nExample: list --sort priority --reverse\n`);
     }
 
     // Sorting logic
@@ -60,14 +59,14 @@ async function listTasks(options) {
       tasks.reverse();
     }
 
-    console.log(chalk.bold("🗂️  Tasks :"));
+    console.log("🗂️  Tasks :");
     tasks.forEach(task => {
       const statusSymbol = task.status === "done" ? "✅" : "📝";
       const priorityLabel = task.priority ? `🔖 ${task.priority}` : "";
       console.log(`${statusSymbol} [${task.status.toUpperCase()}] ${task.title} @ ${task.date} ${task.time} ${priorityLabel} (ID: ${task.id})`);
     });
   } catch (err) {
-    console.error(chalk.red("❌ Failed to list tasks:"), err.message);
+    console.error("❌ Failed to list tasks:", err.message);
   }
 }
 

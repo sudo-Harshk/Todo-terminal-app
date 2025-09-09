@@ -1,5 +1,4 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 
 module.exports = async () => {
   try {
@@ -7,7 +6,7 @@ module.exports = async () => {
     const snapshot = await trashRef.get();
 
     if (snapshot.empty) {
-      console.log(chalk.gray("🧺 Trash is empty. Nothing to undo."));
+      console.log("🧺 Trash is empty. Nothing to undo.");
       return;
     }
 
@@ -20,8 +19,8 @@ module.exports = async () => {
     await db.collection("tasks").doc(id).set(task);
     await db.collection("trash").doc(id).delete();
 
-    console.log(chalk.greenBright(`♻️  Restored task: "${task.title}"`));
+    console.log(`♻️  Restored task: "${task.title}"`);
   } catch (err) {
-    console.error(chalk.red("❌ Failed to undo delete:"), err.message);
+    console.error("❌ Failed to undo delete:", err.message);
   }
 };

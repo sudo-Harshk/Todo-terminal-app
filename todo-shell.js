@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const readline = require("readline");
-const chalk = require("chalk");
 const { spawn } = require("child_process");
 const stringSimilarity = require("string-similarity");
 
@@ -19,15 +18,15 @@ const rl = readline.createInterface({
 
 function showAnimatedIntro(callback) {
   console.clear();
-  const lines = [chalk.cyan("🌀 Starting..."), chalk.gray("🎯 Preparing your space...")];
+  const lines = ["🌀 Starting...", "🎯 Preparing your space..."];
   let i = 0;
   const delay = 700;
   const interval = setInterval(() => {
     if (i >= lines.length) {
       clearInterval(interval);
       console.log();
-      console.log(chalk.greenBright("📦 Welcome to Your Todo Terminal"));
-      console.log(chalk.gray("Type 'help' to see available commands.\n"));
+      console.log("📦 Welcome to Your Todo Terminal");
+      console.log("Type 'help' to see available commands.\n");
       callback();
     } else {
       console.log(lines[i]);
@@ -46,7 +45,7 @@ rl.on("line", (line) => {
 
   switch (command) {
     case "help":
-      console.log(chalk.cyanBright.bold("\n📘 Available Commands:\n"));
+      console.log("\n📘 Available Commands:\n");
       const helpCommands = [
         ["list", "List tasks or filter by date"],
         ["dashboard", "Overall summary"],
@@ -72,7 +71,7 @@ rl.on("line", (line) => {
       const width = 48;
       helpCommands.forEach(([cmd, desc]) => {
         const padded = cmd.padEnd(width, " ");
-        console.log(`  ${chalk.green(padded)}→  ${desc}`);
+        console.log(`  ${padded}→  ${desc}`);
       });
       console.log();
       break;
@@ -84,18 +83,18 @@ rl.on("line", (line) => {
       return;
 
     case "exit":
-      console.log(chalk.blue("👋 Exiting todo terminal..."));
+      console.log("👋 Exiting todo terminal...");
       rl.close();
       return;
 
     default:
       const match = stringSimilarity.findBestMatch(command, knownCommands).bestMatch;
       if (!knownCommands.includes(command)) {
-        console.log(chalk.red(`❌ Unknown command: '${command}'`));
+        console.log(`❌ Unknown command: '${command}'`);
         if (match.rating > 0.4 && match.target !== command) {
-          console.log(chalk.yellow(`💡 Did you mean '${match.target}'?`));
+          console.log(`💡 Did you mean '${match.target}'?`);
         }
-        console.log(chalk.gray("Type 'help' to see available commands.\n"));
+        console.log("Type 'help' to see available commands.\n");
         rl.prompt();
         return;
       }
@@ -108,7 +107,7 @@ rl.on("line", (line) => {
 
       // Only show the enquirer message for GitHub
       if (command === "github") {
-        console.log(chalk.gray("Starting GitHub Explorer with enquirer"));
+        console.log("Starting GitHub Explorer with enquirer");
       }
 
       child.on("exit", () => {
@@ -123,6 +122,6 @@ rl.on("line", (line) => {
 });
 
 rl.on("close", () => {
-  console.log(chalk.gray("🛑 Terminal session closed.\n"));
+  console.log("🛑 Terminal session closed.\n");
   process.exit(0);
 });

@@ -1,11 +1,10 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 
 async function searchTasks(keywordArg) {
   const keyword = keywordArg.toLowerCase();
 
   if (!keyword) {
-    console.log(chalk.yellow("⚠️  Please provide a keyword to search."));
+    console.log("⚠️  Please provide a keyword to search.");
     return;
   }
 
@@ -21,11 +20,11 @@ async function searchTasks(keywordArg) {
     });
 
     if (matches.length === 0) {
-      console.log(chalk.red(`❌ No tasks found matching "${keyword}"`));
+      console.log(`❌ No tasks found matching "${keyword}"`);
       return;
     }
 
-    console.log(chalk.bold(`\n🔍 Results for "${keyword}":\n`));
+    console.log(`\n🔍 Results for "${keyword}":\n`);
 
     matches.forEach(task => {
       const statusSymbol = task.status === "done" ? "✅" : "🔴";
@@ -33,7 +32,7 @@ async function searchTasks(keywordArg) {
     });
 
   } catch (err) {
-    console.error(chalk.red("❌ Error during search:"), err.message);
+    console.error("❌ Error during search:", err.message);
   }
 }
 
