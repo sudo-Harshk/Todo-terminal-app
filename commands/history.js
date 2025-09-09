@@ -1,5 +1,4 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 
 async function showHistory() {
   try {
@@ -8,7 +7,7 @@ async function showHistory() {
       .get();
 
     if (snapshot.empty) {
-      console.log(chalk.yellow("⚠️  No completed tasks yet."));
+      console.log("⚠️  No completed tasks yet.");
       return;
     }
 
@@ -20,7 +19,7 @@ async function showHistory() {
       return a.time.localeCompare(b.time);
     });
 
-    console.log(chalk.cyanBright.bold("\n📜 Completed Tasks History"));
+    console.log("\n📜 Completed Tasks History");
     console.log("────────────────────────────");
 
     tasks.forEach(task => {
@@ -28,9 +27,9 @@ async function showHistory() {
     });
 
     console.log("────────────────────────────");
-    console.log(chalk.greenBright(`📦 Total Completed: ${tasks.length}\n`));
+    console.log(`📦 Total Completed: ${tasks.length}\n`);
   } catch (err) {
-    console.error(chalk.red("❌ Failed to load history:"), err.message);
+    console.error("❌ Failed to load history:", err.message);
   }
 }
 

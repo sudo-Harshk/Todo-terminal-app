@@ -1,12 +1,11 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 const dayjs = require("dayjs");
 
 module.exports = async () => {
   try {
     const snapshot = await db.collection("tasks").where("status", "==", "done").get();
     if (snapshot.empty) {
-      console.log(chalk.yellow("⚠️  No completed tasks found."));
+      console.log("⚠️  No completed tasks found.");
       return;
     }
 
@@ -35,13 +34,13 @@ module.exports = async () => {
     }
 
     const lastDone = sortedDates[0];
-    console.log(chalk.bold("\n🔥 Your Task Completion Streak"));
+    console.log("\n🔥 Your Task Completion Streak");
     console.log("────────────────────────────────────────────");
     console.log(`✅ Last Completed Task : ${lastDone}`);
     console.log(`🔥 Current Streak      : ${streak} day(s)`);
     console.log("────────────────────────────────────────────\n");
 
   } catch (err) {
-    console.error(chalk.red("❌ Failed to calculate streak:"), err.message);
+    console.error("❌ Failed to calculate streak:", err.message);
   }
 };

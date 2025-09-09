@@ -1,5 +1,4 @@
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 const readline = require("readline");
 
 module.exports = async () => {
@@ -9,12 +8,12 @@ module.exports = async () => {
   });
 
   rl.question(
-    chalk.redBright("⚠️  Are you sure you want to delete ALL tasks? (yes/no): "),
+    "⚠️  Are you sure you want to delete ALL tasks? (yes/no): ",
     async (answer) => {
       rl.close();
 
       if (answer.toLowerCase() !== "yes") {
-        console.log(chalk.yellow("❌ Cancelled. No tasks were deleted."));
+        console.log("❌ Cancelled. No tasks were deleted.");
         return;
       }
 
@@ -22,7 +21,7 @@ module.exports = async () => {
         const snapshot = await db.collection("tasks").get();
 
         if (snapshot.empty) {
-          console.log(chalk.yellow("⚠️  No tasks found to delete."));
+          console.log("⚠️  No tasks found to delete.");
           return;
         }
 
@@ -30,9 +29,9 @@ module.exports = async () => {
         snapshot.forEach((doc) => batch.delete(doc.ref));
         await batch.commit();
 
-        console.log(chalk.greenBright("✅ All tasks have been deleted successfully!"));
+        console.log("✅ All tasks have been deleted successfully!");
       } catch (err) {
-        console.error(chalk.red("❌ Failed to delete tasks:"), err.message);
+        console.error("❌ Failed to delete tasks:", err.message);
       }
     }
   );

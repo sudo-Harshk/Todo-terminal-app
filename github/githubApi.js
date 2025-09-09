@@ -1,5 +1,4 @@
 const axios = require("axios");
-const chalk = require("chalk");
 const { prompt } = require("enquirer");
 
 let cachedUsername = null;
@@ -21,7 +20,7 @@ async function getUsername() {
 async function getUserRepos(username) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    console.log(chalk.red("❌ GITHUB_TOKEN not found in .env"));
+    console.log("❌ GITHUB_TOKEN not found in .env");
     process.exit(1);
   }
 

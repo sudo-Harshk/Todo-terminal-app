@@ -2,7 +2,6 @@ const db = require("../firebase/firestore");
 const dayjs = require("dayjs");
 const isSameOrAfter = require("dayjs/plugin/isSameOrAfter");
 const isSameOrBefore = require("dayjs/plugin/isSameOrBefore");
-const chalk = require("chalk");
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -16,7 +15,7 @@ async function showWeekView(options) {
   const weekStart = today.startOf("week").add(1 + offset * 7, "day"); // Monday with offset
   const weekEnd = weekStart.add(6, "day"); // Sunday
 
-  console.log(chalk.bold(`\n📆 Week View: ${weekStart.format("MMM D")} – ${weekEnd.format("MMM D, YYYY")}`));
+  console.log(`\n📆 Week View: ${weekStart.format("MMM D")} – ${weekEnd.format("MMM D, YYYY")}`);
   console.log("────────────────────────────────────────────\n");
 
   let allTasks = [];
@@ -39,7 +38,7 @@ async function showWeekView(options) {
       .filter(t => t.date === dateStr)
       .sort((a, b) => a.time.localeCompare(b.time));
 
-    console.log(chalk.blue.bold(`🗓️  ${label} (${currentDate.format("MMM D")})`));
+    console.log(`🗓️  ${label} (${currentDate.format("MMM D")})`);
 
     if (dailyTasks.length === 0) {
       console.log("  (No tasks)\n");
@@ -59,7 +58,7 @@ async function showWeekView(options) {
   const total = totalDone + totalPending;
 
   console.log("────────────────────────────────────────────");
-  console.log(chalk.green(`✅ ${totalDone} Done`) + "     " + chalk.red(`🔴 ${totalPending} Pending`) + `     📌 Total: ${total} Tasks\n`);
+  console.log(`✅ ${totalDone} Done` + "     " + `🔴 ${totalPending} Pending` + `     📌 Total: ${total} Tasks\n`);
 }
 
 module.exports = showWeekView;

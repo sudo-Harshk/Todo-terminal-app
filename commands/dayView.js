@@ -1,6 +1,5 @@
 // commands/dayView.js
 const db = require("../firebase/firestore");
-const chalk = require("chalk");
 const dayjs = require("dayjs");
 
 // Enable support for custom date formats like DD-MM-YYYY
@@ -11,13 +10,13 @@ async function showDayView(options) {
   const { date } = options;
 
   if (!date) {
-    console.log(chalk.red("❌ Please provide a date using --date YYYY-MM-DD"));
+    console.log("❌ Please provide a date using --date DD-MM-YYYY");
     return;
   }
 
-  const parsed = dayjs(date, "YYYY-MM-DD");
+  const parsed = dayjs(date, "DD-MM-YYYY");
   if (!parsed.isValid()) {
-    console.log(chalk.red("❌ Invalid date format. Use --date YYYY-MM-DD"));
+    console.log("❌ Invalid date format. Use --date DD-MM-YYYY");
     return;
   }
 
@@ -28,11 +27,11 @@ async function showDayView(options) {
       .where("date", "==", dateFormatted)
       .get();
 
-    console.log(chalk.bold(`\n📅 Tasks on ${parsed.format("MMM D, YYYY")}`));
+    console.log(`\n📅 Tasks on ${parsed.format("MMM D, YYYY")}`);
     console.log("────────────────────────────\n");
 
     if (snapshot.empty) {
-      console.log(chalk.yellow("⚠️  No tasks found for this date.\n"));
+      console.log("⚠️  No tasks found for this date.\n");
       return;
     }
 
@@ -48,7 +47,7 @@ async function showDayView(options) {
 
     console.log();
   } catch (err) {
-    console.error(chalk.red("❌ Failed to load tasks:"), err.message);
+    console.error("❌ Failed to load tasks:", err.message);
   }
 }
 

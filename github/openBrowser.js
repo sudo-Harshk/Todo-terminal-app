@@ -1,5 +1,4 @@
 const { spawn } = require("child_process");
-const chalk = require("chalk");
 const os = require("os");
 
 function openInBrowser(url) {

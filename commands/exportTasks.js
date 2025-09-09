@@ -1,6 +1,5 @@
 const db = require("../firebase/firestore");
 const fs = require("fs");
-const chalk = require("chalk");
 const { writeToPath } = require("fast-csv");
 
 async function exportTasks() {
@@ -21,7 +20,7 @@ async function exportTasks() {
     });
 
     if (tasks.length === 0) {
-      console.log(chalk.yellow("⚠️ No tasks found to export."));
+      console.log("⚠️ No tasks found to export.");
       return;
     }
 
@@ -29,14 +28,14 @@ async function exportTasks() {
 
     writeToPath(filePath, tasks, { headers: true })
       .on("finish", () => {
-        console.log(chalk.green(`✅ Exported ${tasks.length} tasks to ${filePath}\n`));
+        console.log(`✅ Exported ${tasks.length} tasks to ${filePath}\n`);
       })
       .on("error", err => {
-        console.error(chalk.red("❌ Error writing CSV:"), err.message);
+        console.error("❌ Error writing CSV:", err.message);
       });
 
   } catch (err) {
-    console.error(chalk.red("❌ Failed to export tasks:"), err.message);
+    console.error("❌ Failed to export tasks:", err.message);
   }
 }
 
